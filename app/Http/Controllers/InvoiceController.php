@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\InvoiceExport;
 use App\Models\Invoice;
 use App\Models\Invoice_items;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InvoiceController extends Controller
 {
@@ -52,6 +54,9 @@ public function tableInvoice(Request $request)
         ->editColumn('total', function ($row) {
             return number_format($row->total, 0, ',', '.');
         })
+        ->editColumn('invoice_date', function ($row) {
+            return Carbon::parse($row->invoice_date)->format('d-m-Y');
+        })
         ->addColumn('action', function ($row) {
             return '
                 <a href="' . route('invoice.download', $row->id) . '" 
@@ -80,8 +85,8 @@ public function tableInvoice(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
-            'phone' => 'required',
-            'address' => 'required',
+            // 'phone' => 'required',
+            // 'address' => 'required',
             'date' => 'required',
             'items_json' => 'required'
 
@@ -179,6 +184,15 @@ public function tableInvoice(Request $request)
         //
     }
 
+    public function exportExcel(Request $request)
+    {
+
+        $filename = 'invoices_' . Carbon::now()->format('Ymd_His') . '.xlsx';
+        return Excel::download(
+            new InvoiceExport($request), 
+            $filename);
+    }
+
     public function downloadPDF($id)
     {
         $invoice = Invoice::with('items')->findOrFail($id);
@@ -207,20 +221,6 @@ public function tableInvoice(Request $request)
 
     public function previewPDF(Request $request)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'name' => 'required|max:255',
-        //     'phone' => 'required',
-        //     'address' => 'required',
-        //     'date' => 'required',
-        //     'items_json' => 'required'
-
-        // ]);
-        // if ($validator->fails()) {
-        //     Alert::error('Error', 'Silahkan lengkapi semua data ');
-        //     return redirect('/invoice/create')
-        //         ->withErrors($validator)
-        //         ->withInput();
-        // }
 
         $items = json_decode($request->items_json, true);
         $totalPrice = 0;

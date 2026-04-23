@@ -12,7 +12,7 @@
         <div class="d-flex justify-content-between align-items-center my-1 p-3">
 
           <!-- LEFT -->
-          <div class="d-flex gap-2">
+          <div class="d-flex gap-2 fitur-filter">
             <input type="date" id="start_date" class="form-control form-control-sm">
             <input type="date" id="end_date" class="form-control form-control-sm">
 
@@ -22,6 +22,9 @@
 
             <button id="btn-reset" class="btn btn-sm btn-secondary">
               Reset
+            </button>
+            <button id="btn-export" class="btn btn-success btn-sm">
+              Export Excel
             </button>
           </div>
 
@@ -61,6 +64,27 @@
 @endpush
 @push('css-internal')
 <style>
+
+  .fitur-filter {
+    width: 100%;
+  }
+
+  .fitur-filter .form-control {
+    width: 38%;
+  }
+
+  @media (max-width: 576px) {
+    .fitur-filter {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .fitur-filter .form-control {
+      width: 100%;
+    }
+  }
+
+  
   .breadcrumb {
     margin: 1rem;
   }
@@ -116,13 +140,28 @@
       });
     });
 
+    $('#btn-export').on('click', function() {
+      if (!$('#start_date').val() || !$('#end_date').val()) {
+        swal({
+          title: "Silahkan pilih tanggal mulai dan tanggal akhir",
+          text: "Tanggal mulai dan tanggal akhir harus diisi untuk melakukan export data.",
+          icon: "warning",
+          // buttons: true,
+          dangerMode: true,
+      })
+        return;
+      }
+      let start_date = $('#start_date').val();
+      let end_date = $('#end_date').val();
+      let url = "{{ route('invoice.export-excel') }}?start_date=" + start_date + "&end_date=" + end_date;
+      window.location.href = url;
+    });
+
 
 
     $('.seat-form').on('keyup', function() {
       let seat = $(this).val();
       let input = $(this).attr('data-seat')
-      // alert(input)
-      // alert(seat)
 
       $.ajax({
         type: "POST",

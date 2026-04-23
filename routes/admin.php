@@ -37,7 +37,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('invoice/ajax-table', [InvoiceController::class, 'tableInvoice'])->name('invoice.ajax');
         Route::post('invoice/preview-pdf', [InvoiceController::class,'previewPDF'])->name('invoice.preview');
         Route::get('invoice/download/{id}', [InvoiceController::class, 'downloadPDF'])->name('invoice.download');
-
+        Route::get('invoice/export-excel', [InvoiceController::class, 'exportExcel'])->name('invoice.export-excel');
 
         Route::resource('invoice', InvoiceController::class);
 
