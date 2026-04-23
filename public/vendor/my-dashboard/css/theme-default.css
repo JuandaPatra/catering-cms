@@ -479,16 +479,16 @@ button.list-group-item-primary.active {
 .menu.bg-primary .menu-block::before {
   background-color: #c2c4ff;
 }
-.menu.bg-primary .menu-inner > .menu-item.open .menu-item.open > .menu-toggle::before {
+/* .menu.bg-primary .menu-inner > .menu-item.open .menu-item.open > .menu-toggle::before {
   background-color: #8385ff;
-}
-.menu.bg-primary .menu-inner > .menu-item.open .menu-item.active > .menu-link::before {
+} */
+/* .menu.bg-primary .menu-inner > .menu-item.open .menu-item.active > .menu-link::before {
   background-color: #fff;
 }
 .menu.bg-primary .menu-inner > .menu-item.open .menu-item.open > .menu-toggle::before,
 .menu.bg-primary .menu-inner > .menu-item.open .menu-item.active > .menu-link::before {
   box-shadow: 0 0 0 2px #6d70ff;
-}
+} */
 .menu.bg-primary .ps__thumb-y,
 .menu.bg-primary .ps__rail-y.ps--clicking > .ps__thumb-y {
   background: rgba(255, 255, 255, 0.5942917647) !important;
@@ -715,13 +715,13 @@ a:hover {
 .bg-menu-theme .menu-inner > .menu-item.open .menu-item.open > .menu-toggle::before {
   background-color: white;
 }
-.bg-menu-theme .menu-inner > .menu-item.open .menu-item.active > .menu-link::before {
+/* .bg-menu-theme .menu-inner > .menu-item.open .menu-item.active > .menu-link::before {
   background-color: #566a7f;
 }
 .bg-menu-theme .menu-inner > .menu-item.open .menu-item.open > .menu-toggle::before,
 .bg-menu-theme .menu-inner > .menu-item.open .menu-item.active > .menu-link::before {
   box-shadow: 0 0 0 2px #fff;
-}
+} */
 .bg-menu-theme .ps__thumb-y,
 .bg-menu-theme .ps__rail-y.ps--clicking > .ps__thumb-y {
   background: rgba(86, 106, 127, 0.2) !important;
