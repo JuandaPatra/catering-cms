@@ -86,15 +86,15 @@ Category Add
                     <div class="row-makanan">
                         <div class="row">
                             <div class="col">
-                                <label for="input_nama_makanan" class="form-label">Nama Pesanan</label>
+                                <label for="input_nama_makanan" class="form-label form-label-pesanan">Nama Pesanan</label>
                                 <input id="input_nama_makanan" name="input_nama_makanan" type="text" placeholder="" class="form-control @error('price') is-invalid @enderror tourPrice" name="input_nama_makanan" value="{{ old('input_nama_makanan') }}" />
                             </div>
                             <div class="col">
-                                <label for="input_qty" class="form-label">Qty</label>
+                                <label for="input_qty" class="form-label form-label-pesanan">Qty</label>
                                 <input id="input_qty" name="input_qty" type="number" placeholder="" class="form-control @error('input_qty') is-invalid @enderror tourPrice" name="input_qty" value="{{ old('input_qty') }}" />
                             </div>
                             <div class="col">
-                                <label for="input_price" class="form-label">harga</label>
+                                <label for="input_price" class="form-label form-label-pesanan">harga</label>
                                 <input id="input_price" name="input_price" type="text" placeholder="" class="form-control @error('input_price') is-invalid @enderror tourPrice" name="input_price" value="{{ old('input_price') }}" />
                             </div>
                             <div class="row mt-2">
@@ -123,6 +123,7 @@ Category Add
 
 </form>
 @endsection
+
 @push('javascript-external')
 
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
@@ -477,4 +478,14 @@ Category Add
     renderTable();
 </script>
 @endif
+@endpush
+
+@push('javascript-internal')
+<style>
+    .form-label-pesanan{
+        @media(max-width: 576px) {
+            height:30px;
+        }
+    }
+</style>
 @endpush
