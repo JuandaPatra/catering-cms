@@ -9,6 +9,23 @@
       <!-- Basic Bootstrap Table -->
       <div class="card">
         <h5 class="card-header">List Invoice</h5>
+        <div class="d-flex justify-content-between align-items-center my-1 p-3">
+
+          <!-- LEFT -->
+          <div class="d-flex gap-2">
+            <input type="date" id="start_date" class="form-control form-control-sm">
+            <input type="date" id="end_date" class="form-control form-control-sm">
+
+            <button id="btn-filter" class="btn btn-sm btn-primary">
+              Filter
+            </button>
+
+            <button id="btn-reset" class="btn btn-sm btn-secondary">
+              Reset
+            </button>
+          </div>
+
+        </div>
         <div class="table-responsive text-nowrap" style="height:1000px; padding:1rem;">
           <table class="table data-table">
             <thead>
@@ -24,7 +41,7 @@
             <tbody class="table-border-bottom-0 ">
 
 
-              
+
 
             </tbody>
           </table>
@@ -44,9 +61,10 @@
 @endpush
 @push('css-internal')
 <style>
-  .breadcrumb{
+  .breadcrumb {
     margin: 1rem;
   }
+
   .post-tumbnail {
     width: 100%;
     height: 400px;
@@ -170,10 +188,18 @@
         });
     });
 
+    
+
     var table = $('.data-table').DataTable({
       processing: true,
       serverSide: true,
-      ajax: "{{ route('invoice.ajax') }}",
+      ajax: {
+        url: "{{ route('invoice.ajax') }}",
+        data: function(d) {
+          d.start_date = $('#start_date').val();
+          d.end_date = $('#end_date').val();
+        }
+      },
       columns: [
         //{data: 'DT_RowIndex', name: 'DT_RowIndex'},
         //  { "width": "20%" },
@@ -206,6 +232,18 @@
 
 
       ]
+    });
+
+    // trigger filter
+    $('#btn-filter').on('click', function() {
+      table.draw();
+    });
+
+    // reset
+    $('#btn-reset').on('click', function() {
+      $('#start_date').val('');
+      $('#end_date').val('');
+      table.draw();
     });
   });
 </script>

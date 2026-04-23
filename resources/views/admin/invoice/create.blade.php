@@ -25,8 +25,8 @@ Category Add
                         @enderror
                     </div>
                     <div class="mb-3">
-                        <label for="input_post_title" class="form-label">Nomer HP</label>
-                        <input id="input_post_title" name="phone" type="text" placeholder="" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') }}" />
+                        <label for="input_phone" class="form-label">Nomer HP</label>
+                        <input id="input_phone" name="phone" type="text" pattern="[0-9+]*" placeholder="" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') }}" />
                         @error('phone')
                         <span class="invalid-feedback" role="alert">
                             <strong>Wajib diisi</strong>
@@ -34,8 +34,8 @@ Category Add
                         @enderror
                     </div>
                     <div class="mb-3">
-                        <label for="input_post_title" class="form-label">Alamat</label>
-                        <input id="input_post_title" name="address" type="text" placeholder="" class="form-control @error('address') is-invalid @enderror" name="address" value="{{ old('address') }}" />
+                        <label for="input_address" class="form-label">Alamat</label>
+                        <input id="input_address" name="address" type="text" placeholder="" class="form-control @error('address') is-invalid @enderror" name="address" value="{{ old('address') }}" />
                         @error('address')
                         <span class="invalid-feedback" role="alert">
                             <strong>Wajib diisi</strong>
@@ -43,9 +43,9 @@ Category Add
                         @enderror
                     </div>
                     <div class="mb-3">
-                        <label for="input_post_title" class="form-label">Tanggal Pemesanan</label>
+                        <label for="input_date" class="form-label">Tanggal Pemesanan</label>
                         <input id="datepicker" name="date" type="text" placeholder="" class="form-control @error('date') is-invalid @enderror" name="date" value="{{ old('date') }}" />
-                        @error('title')
+                        @error('date')
                         <span class="invalid-feedback" role="alert">
                             <strong>Wajib diisi</strong>
                         </span>
@@ -91,7 +91,7 @@ Category Add
                             </div>
                             <div class="col">
                                 <label for="input_qty" class="form-label">Qty</label>
-                                <input id="input_qty" name="input_qty" type="text" placeholder="" class="form-control @error('input_qty') is-invalid @enderror tourPrice" name="input_qty" value="{{ old('input_qty') }}" />
+                                <input id="input_qty" name="input_qty" type="number" placeholder="" class="form-control @error('input_qty') is-invalid @enderror tourPrice" name="input_qty" value="{{ old('input_qty') }}" />
                             </div>
                             <div class="col">
                                 <label for="input_price" class="form-label">harga</label>
@@ -142,6 +142,33 @@ Category Add
 @push('javascript-internal')
 <script>
     $(document).ready(function() {
+
+        $('#input_phone').on('input', function() {
+            let value = $(this).val();
+
+            // hanya angka dan +
+            value = value.replace(/[^0-9+]/g, '');
+
+            // + hanya boleh di depan
+            if (value.indexOf('+') > 0) {
+                value = value.replace(/\+/g, '');
+            }
+
+            if(value.length >= 13) {
+                value = value.slice(0, 13);
+            }
+
+            $(this).val(value);
+        });
+
+        $('#input_price').on('input', function() {
+            let value = $(this).val();
+
+            // hanya angka
+            value = value.replace(/[^0-9]/g, '');
+
+            $(this).val(value);
+        });
 
         $('form').on('submit', function() {
 

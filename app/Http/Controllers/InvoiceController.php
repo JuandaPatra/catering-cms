@@ -22,29 +22,48 @@ class InvoiceController extends Controller
         return view('admin.invoice.index');
     }
 
-    public function tableInvoice(Request $request)
-    {
-        if ($request->ajax()) {
-            $datas = Invoice::get();
-        }
+public function tableInvoice(Request $request)
+{
+    $query = Invoice::query();
 
-        return Datatables::of($datas)
-            ->addIndexColumn()
-            ->editColumn('total', function ($row) {
-                return number_format($row->total, 0, ',', '.');
-            })
-            ->addColumn('action', function ($user) {
+    return Datatables::of($query)
+        ->filter(function ($query) use ($request) {
 
-                $deleteUrl = route('product.destroy', $user->id);
+            // 🔍 SEARCH
+            $search = $request->input('search.value');
 
-                return '
-                <a href="' . route('invoice.download', $user->id) . '" class="btn btn-xs btn-primary"><i class="fa fa-edit" target="_blank"></i> Download PDF</a>   
-                ';
-            })
-            ->rawColumns(['action'])
-            ->make(true)
-        ;
-    }
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('customer_name', 'like', "%{$search}%")
+                      ->orWhere('invoice_number', 'like', "%{$search}%");
+                });
+            }
+
+            // 📅 DATE RANGE
+            if ($request->start_date && $request->end_date) {
+                $query->whereBetween('invoice_date', [
+                    $request->start_date,
+                    $request->end_date
+                ]);
+            }
+
+        })
+        ->addIndexColumn()
+        ->editColumn('total', function ($row) {
+            return number_format($row->total, 0, ',', '.');
+        })
+        ->addColumn('action', function ($row) {
+            return '
+                <a href="' . route('invoice.download', $row->id) . '" 
+                   target="_blank"
+                   class="btn btn-sm btn-primary">
+                   Download PDF
+                </a>
+            ';
+        })
+        ->rawColumns(['action'])
+        ->make(true);
+}
 
     /**
      * Show the form for creating a new resource.
@@ -212,7 +231,7 @@ class InvoiceController extends Controller
         }
 
         $invoice_number = $this->invoiceNumber('DRAFT');
-        
+
         $data = [
             "name" => $request->name,
             "phone" => $request->phone,
