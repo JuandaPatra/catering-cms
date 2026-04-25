@@ -168,9 +168,9 @@
             <td width="60%" valign="top">
                 <strong>Pembayaran</strong><br><br>
 
-                Bank: BCA<br>
-                No. Rekening: 1234567890<br>
-                Atas Nama: Dapur Mama Kita
+                Bank: Bank Syariah Indonesia<br>
+                No. Rekening: 7106663801<br>
+                Atas Nama: Rahmaniar Zulfana Putri
             </td>
 
             <!-- KANAN: TTD + MATERAI -->
@@ -193,7 +193,7 @@
 
                 <br><br>
 
-                <strong>Dapur Mama Kita</strong>
+                <strong>Rahmaniar Zulfana Putri</strong>
 
             </td>
 
