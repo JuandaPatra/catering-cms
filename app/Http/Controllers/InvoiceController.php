@@ -24,51 +24,50 @@ class InvoiceController extends Controller
         return view('admin.invoice.index');
     }
 
-public function tableInvoice(Request $request)
-{
-    $query = Invoice::query();
+    public function tableInvoice(Request $request)
+    {
+        $query = Invoice::query();
 
-    return Datatables::of($query)
-        ->filter(function ($query) use ($request) {
+        return Datatables::of($query)
+            ->filter(function ($query) use ($request) {
 
-            // 🔍 SEARCH
-            $search = $request->input('search.value');
+                // 🔍 SEARCH
+                $search = $request->input('search.value');
 
-            if ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('customer_name', 'like', "%{$search}%")
-                      ->orWhere('invoice_number', 'like', "%{$search}%");
-                });
-            }
+                if ($search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('customer_name', 'like', "%{$search}%")
+                            ->orWhere('invoice_number', 'like', "%{$search}%");
+                    });
+                }
 
-            // 📅 DATE RANGE
-            if ($request->start_date && $request->end_date) {
-                $query->whereBetween('invoice_date', [
-                    $request->start_date,
-                    $request->end_date
-                ]);
-            }
-
-        })
-        ->addIndexColumn()
-        ->editColumn('total', function ($row) {
-            return number_format($row->total, 0, ',', '.');
-        })
-        ->editColumn('invoice_date', function ($row) {
-            return Carbon::parse($row->invoice_date)->format('d-m-Y');
-        })
-        ->addColumn('action', function ($row) {
-            return '
+                // 📅 DATE RANGE
+                if ($request->start_date && $request->end_date) {
+                    $query->whereBetween('invoice_date', [
+                        $request->start_date,
+                        $request->end_date
+                    ]);
+                }
+            })
+            ->addIndexColumn()
+            ->editColumn('total', function ($row) {
+                return number_format($row->total, 0, ',', '.');
+            })
+            ->editColumn('invoice_date', function ($row) {
+                return Carbon::parse($row->invoice_date)->format('d-m-Y');
+            })
+            ->addColumn('action', function ($row) {
+                return '
                 <a href="' . route('invoice.download', $row->id) . '" 
                    target="_blank"
                    class="btn btn-sm btn-primary">
                    Download PDF
                 </a>
             ';
-        })
-        ->rawColumns(['action'])
-        ->make(true);
-}
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -105,16 +104,17 @@ public function tableInvoice(Request $request)
             $totalPrice  = $totalPrice + $totalPerItems;
         }
 
-        // $invoiceNumber = $this->invoiceNumber();
+        $invoiceNumber = $this->invoiceNumber();
 
-        $last = Invoice::whereMonth('created_at', now()->month)
-            ->lockForUpdate()
-            ->latest('id')
-            ->first();
 
-        $nextNumber = $last ? ((int) substr($last->invoice_number, -1) + 1) : 1;
+        // $last = Invoice::whereMonth('created_at', now()->month)
+        //     ->lockForUpdate()
+        //     ->latest('id')
+        //     ->first();
 
-        $invoiceNumber = 'INV-' . now()->format('Ym') . '-' . $nextNumber;
+        // $nextNumber = $last ? ((int) substr($last->invoice_number, -1) + 1) : 1;
+
+        // $invoiceNumber = 'INV-' . now()->format('Ym') . '-' . $nextNumber;
 
 
         DB::beginTransaction();
@@ -189,8 +189,9 @@ public function tableInvoice(Request $request)
 
         $filename = 'invoices_' . Carbon::now()->format('Ymd_His') . '.xlsx';
         return Excel::download(
-            new InvoiceExport($request), 
-            $filename);
+            new InvoiceExport($request),
+            $filename
+        );
     }
 
     public function downloadPDF($id)
@@ -230,7 +231,7 @@ public function tableInvoice(Request $request)
             $totalPrice  = $totalPrice + $totalPerItems;
         }
 
-        $invoice_number = $this->invoiceNumber('DRAFT');
+        $invoice_number = 'DRAFT-' . now()->format('Ymd') . '-' . rand(1, 9999);
 
         $data = [
             "name" => $request->name,
@@ -257,15 +258,34 @@ public function tableInvoice(Request $request)
 
     private function invoiceNumber($prefix = 'INV')
     {
-        $last = Invoice::whereMonth('created_at', now()->month)
-            ->lockForUpdate()
-            ->latest('id')
-            ->first();
+        return DB::transaction(function () use ($prefix) {
+            $period = now()->format('Ymd');
 
-        $nextNumber = $last ? ((int) substr($last->invoice_number, -1) + 1) : 1;
-        $invoiceNumber = $prefix . '-' . now()->format('Ym') . '-' . $nextNumber;
+            $sequence = DB::table('Invoice_sequences')
+                ->where('period', $period)
+                ->lockForUpdate()
+                ->first();
+                
 
-        return $invoiceNumber;
+            if (!$sequence) {
+                DB::table('Invoice_sequences')->insert([
+                    'period' => $period,
+                    'last_number' => 1,
+                ]);
+
+                $nextNumber = 1;
+            } else {
+                $nextNumber = $sequence->last_number + 1;
+
+                DB::table('Invoice_sequences')
+                    ->where('period', $period)
+                    ->update([
+                        'last_number' => $nextNumber
+                    ]);
+            }
+
+            return $prefix . '-' . $period . '-' . $nextNumber;
+        });
     }
 
     private function formatItem($items)
