@@ -261,14 +261,14 @@ class InvoiceController extends Controller
         return DB::transaction(function () use ($prefix) {
             $period = now()->format('Ymd');
 
-            $sequence = DB::table('Invoice_sequences')
+            $sequence = DB::table('invoice_sequences')
                 ->where('period', $period)
                 ->lockForUpdate()
                 ->first();
                 
 
             if (!$sequence) {
-                DB::table('Invoice_sequences')->insert([
+                DB::table('invoice_sequences')->insert([
                     'period' => $period,
                     'last_number' => 1,
                 ]);
@@ -277,7 +277,7 @@ class InvoiceController extends Controller
             } else {
                 $nextNumber = $sequence->last_number + 1;
 
-                DB::table('Invoice_sequences')
+                DB::table('invoice_sequences')
                     ->where('period', $period)
                     ->update([
                         'last_number' => $nextNumber
